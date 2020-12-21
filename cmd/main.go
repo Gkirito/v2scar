@@ -43,17 +43,29 @@ func main() {
 			EnvVar:      "V2SCAR_SYNC_TIME",
 			Destination: &SYNC_TIME,
 		},
+		cli.StringFlag{
+			Name:        "v2ray-endpoint, vp",
+			Value:       "v2ray-config.json",
+			Usage:       "django-sspanel开放的v2ray的config",
+			EnvVar:      "V2RAY_API_ENDPOINT",
+			Destination: &v2scar.V2RAY_ENDPOINT,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
 		up := v2scar.NewUserPool()
 		log.Println("Waitting v2ray start...")
-		time.Sleep(time.Second * 3)
-		tick := time.Tick(time.Duration(SYNC_TIME) * time.Second)
-		for {
-			go v2scar.SyncTask(up)
-			<-tick
+		go v2scar.RunV2ray(v2scar.V2RAY_ENDPOINT)
+		flag := <- v2scar.FLAG
+		if flag {
+			time.Sleep(time.Second * 3)
+			tick := time.Tick(time.Duration(SYNC_TIME) * time.Second)
+			for {
+				go v2scar.SyncTask(up)
+				<-tick
+			}
 		}
+		return nil
 	}
 
 	err := app.Run(os.Args)

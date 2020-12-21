@@ -14,6 +14,7 @@ COPY . .
 RUN go build -v -a -installsuffix cgo -o v2scar cmd/main.go
 
 FROM alpine:latest
+FROM v2fly/v2fly-core:latest
 
 RUN apk --no-cache add ca-certificates
 

@@ -27,3 +27,4 @@ services:
       V2SCAR_SYNC_TIME: 60
       V2SCAR_API_ENDPOINT: ""
       V2SCAR_GRPC_ENDPOINT: "v2ray:8080"
+      V2RAY_API_ENDPOINT: ""

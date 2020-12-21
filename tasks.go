@@ -14,7 +14,7 @@ import (
 var API_ENDPOINT string
 var GRPC_ENDPOINT string
 var PROTOCOL_ENDPOINT string
-
+var V2RAY_ENDPOINT string
 const (
 	VMESS  string = "vmess"
 	TROJAN string = "trojan"
