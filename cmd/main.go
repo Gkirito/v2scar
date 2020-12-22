@@ -56,7 +56,7 @@ func main() {
 		up := v2scar.NewUserPool()
 		log.Println("Waitting v2ray start...")
 		go v2scar.RunV2ray(v2scar.V2RAY_ENDPOINT)
-		flag := <- v2scar.FLAG
+		flag := <-v2scar.V2rayRunFlag
 		if flag {
 			time.Sleep(time.Second * 3)
 			tick := time.Tick(time.Duration(SYNC_TIME) * time.Second)

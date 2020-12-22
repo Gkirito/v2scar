@@ -15,6 +15,7 @@ var API_ENDPOINT string
 var GRPC_ENDPOINT string
 var PROTOCOL_ENDPOINT string
 var V2RAY_ENDPOINT string
+
 const (
 	VMESS  string = "vmess"
 	TROJAN string = "trojan"
@@ -45,10 +46,15 @@ type syncReq struct {
 	UserTraffics []*UserTraffic `json:"user_traffics"`
 }
 
+type syncStatusSignal struct {
+	StatusSig string `json:"status_sig"`
+}
+
 type syncResp struct {
 	Configs  []*UserConfig
 	Tag      string `json:"tag"`
 	Protocol string `json:"protocol"`
+	RtSignal bool `json:"rtsignal"`
 }
 
 func SyncTask(up *UserPool) {
@@ -76,11 +82,18 @@ func SyncTask(up *UserPool) {
 		return
 	}
 
-	// init or update user config
-	initOrUpdateUser(up, proxymanClient, &resp)
+	if resp.RtSignal {
+		CloseV2rayNotifier <- resp.RtSignal
+		time.Sleep(time.Second * 3)
+		go RunV2ray(V2RAY_ENDPOINT)
+		syncRestartSignal(<-V2rayRunFlag, httpClient)
+	}else {
+		// init or update user config
+		initOrUpdateUser(up, proxymanClient, &resp)
 
-	// sync user traffic
-	syncUserTrafficToServer(up, statClient, httpClient)
+		// sync user traffic
+		syncUserTrafficToServer(up, statClient, httpClient)
+	}
 }
 
 func initOrUpdateUser(up *UserPool, c v2proxyman.HandlerServiceClient, sr *syncResp) {
@@ -160,4 +173,12 @@ func syncUserTrafficToServer(up *UserPool, c v2stats.StatsServiceClient, hc *htt
 	}
 	postJson(hc, API_ENDPOINT, &syncReq{UserTraffics: tfs})
 	log.Printf("[INFO] Call syncUserTrafficToServer ONLINE USER COUNT: %d", len(tfs))
+}
+
+func syncRestartSignal(isSuccess bool,hc *http.Client)  {
+	var meg string = "fail"
+	if isSuccess {
+		meg = "success"
+	}
+	postJson(hc, API_ENDPOINT, &syncStatusSignal{StatusSig: meg})
 }
