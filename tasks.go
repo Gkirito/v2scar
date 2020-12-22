@@ -54,7 +54,7 @@ type syncResp struct {
 	Configs  []*UserConfig
 	Tag      string `json:"tag"`
 	Protocol string `json:"protocol"`
-	RtSignal bool `json:"rtsignal"`
+	RtSignal bool   `json:"rtsignal"`
 }
 
 func SyncTask(up *UserPool) {
@@ -87,7 +87,7 @@ func SyncTask(up *UserPool) {
 		time.Sleep(time.Second * 3)
 		go RunV2ray(V2RAY_ENDPOINT)
 		syncRestartSignal(<-V2rayRunFlag, httpClient)
-	}else {
+	} else {
 		// init or update user config
 		initOrUpdateUser(up, proxymanClient, &resp)
 
@@ -175,7 +175,7 @@ func syncUserTrafficToServer(up *UserPool, c v2stats.StatsServiceClient, hc *htt
 	log.Printf("[INFO] Call syncUserTrafficToServer ONLINE USER COUNT: %d", len(tfs))
 }
 
-func syncRestartSignal(isSuccess bool,hc *http.Client)  {
+func syncRestartSignal(isSuccess bool, hc *http.Client) {
 	var meg string = "fail"
 	if isSuccess {
 		meg = "success"

@@ -23,7 +23,7 @@ func RunV2ray(config string) {
 	_ = cmd.Wait()
 }
 
-func cancelV2ray(cancel context.CancelFunc)  {
+func cancelV2ray(cancel context.CancelFunc) {
 	<-CloseV2rayNotifier
 	log.Println("close v2ray")
 	cancel()
